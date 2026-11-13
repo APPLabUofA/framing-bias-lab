@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Framing lab</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <p class="kicker">Methods lab</p>
+      <p class="title">Framing lab</p>
+    </div>
+    <label class="study-switch">
+      <span>Study</span>
+      <select id="study-select"></select>
+    </label>
+    <p id="question" class="question"></p>
+    <button id="key-pill" class="pill" type="button">Add API key</button>
+  </header>
+  <div class="layout">
+    <nav class="steps" aria-label="Experiment steps">
+      <button type="button" data-view="design"><span>1</span> Design</button>
+      <button type="button" data-view="collect"><span>2</span> Collect</button>
+      <button type="button" data-view="score"><span>3</span> Score</button>
+      <button type="button" data-view="analyze"><span>4</span> Analyze</button>
+      <button type="button" data-view="report"><span>5</span> Report</button>
+    </nav>
+    <main id="view"></main>
+  </div>
+  <p id="toast" class="toast" hidden></p>
+  <dialog id="key-dialog">
+    <form id="key-form">
+      <p class="kicker">Instructor key</p>
+      <h2>API key</h2>
+      <p>Paste the key your instructor gave you. It is saved in a local file on this computer and is never written into a study, a run, or a report.</p>
+      <input id="key-input" type="password" autocomplete="off" placeholder="sk-…" />
+      <div class="row">
+        <button type="submit" value="save">Save key</button>
+        <button type="button" id="key-test">Test key</button>
+        <button type="button" id="key-clear">Remove saved key</button>
+        <button type="button" id="key-close">Close</button>
+      </div>
+      <p id="key-msg" class="hint"></p>
+    </form>
+  </dialog>
+  <script src="/static/app.js"></script>
+</body>
+</html>
