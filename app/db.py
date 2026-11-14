@@ -253,10 +253,16 @@ def list_runs(study_id: str) -> list[dict]:
     conn = connect()
     try:
         rows = conn.execute(
-            "SELECT id, study_id, name, status, change_note, created_at, updated_at, error, judge_status FROM runs WHERE study_id = ? ORDER BY created_at DESC",
+            "SELECT id, study_id, name, status, change_note, config, created_at, updated_at, error, judge_status FROM runs WHERE study_id = ? ORDER BY created_at DESC",
             (study_id,),
         ).fetchall()
-        return [dict(row) for row in rows]
+        listed = []
+        for row in rows:
+            data = dict(row)
+            config = json.loads(data.pop("config") or "{}")
+            data["model"] = (config.get("settings") or {}).get("model") or ""
+            listed.append(data)
+        return listed
     finally:
         conn.close()
 
@@ -671,40 +677,92 @@ def unscored_done_trials(run_id: str, rater: str, limit: int = 3) -> list[dict]:
         conn.close()
 
 
-def load_api_key() -> tuple[str, str | None]:
-    """Return (key, source) where source is 'saved', 'env', or None. Saved wins."""
-    saved = ""
-    if SETTINGS.exists():
-        try:
-            saved = str(json.loads(SETTINGS.read_text()).get("api_key") or "").strip()
-        except json.JSONDecodeError:
-            saved = ""
-    if saved:
-        return saved, "saved"
-    env = os.environ.get("OPENAI_API_KEY", "").strip()
-    if env:
-        return env, "env"
-    return "", None
+def _read_settings() -> dict:
+    if not SETTINGS.exists():
+        return {}
+    try:
+        data = json.loads(SETTINGS.read_text())
+    except json.JSONDecodeError:
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    keys = dict(data.get("keys") or {})
+    legacy = str(data.get("api_key") or "").strip()
+    if legacy and not keys.get("openai"):
+        keys["openai"] = legacy
+    data["keys"] = keys
+    return data
 
 
-def save_api_key(api_key: str) -> None:
+def _write_settings(data: dict) -> None:
     DATA.mkdir(parents=True, exist_ok=True)
-    SETTINGS.write_text(json.dumps({"api_key": api_key.strip()}))
+    SETTINGS.write_text(json.dumps(data))
     try:
         os.chmod(SETTINGS, 0o600)
     except OSError:
         pass
 
 
-def clear_api_key() -> None:
-    if SETTINGS.exists():
-        SETTINGS.unlink()
+def load_api_key(provider: str = "openai") -> tuple[str, str | None]:
+    """Return (key, source) where source is 'saved', 'env', or None. Saved wins."""
+    provider = "xai" if provider == "xai" else "openai"
+    saved = str(_read_settings().get("keys", {}).get(provider) or "").strip()
+    if saved:
+        return saved, "saved"
+    env_name = "XAI_API_KEY" if provider == "xai" else "OPENAI_API_KEY"
+    env = os.environ.get(env_name, "").strip()
+    if env:
+        return env, "env"
+    return "", None
 
 
-def public_key_status() -> dict:
-    key, source = load_api_key()
+def save_api_key(api_key: str, provider: str = "openai") -> None:
+    provider = "xai" if provider == "xai" else "openai"
+    data = _read_settings()
+    keys = dict(data.get("keys") or {})
+    keys[provider] = api_key.strip()
+    data["keys"] = keys
+    data.pop("api_key", None)
+    _write_settings(data)
+
+
+def clear_api_key(provider: str | None = None) -> None:
+    if provider is None:
+        if SETTINGS.exists():
+            SETTINGS.unlink()
+        return
+    provider = "xai" if provider == "xai" else "openai"
+    data = _read_settings()
+    keys = dict(data.get("keys") or {})
+    keys.pop(provider, None)
+    data["keys"] = keys
+    data.pop("api_key", None)
+    if not any(str(value or "").strip() for value in keys.values()):
+        if SETTINGS.exists():
+            SETTINGS.unlink()
+        return
+    _write_settings(data)
+
+
+def _key_view(provider: str) -> dict:
+    key, source = load_api_key(provider)
     return {
         "configured": bool(key),
         "source": source,
         "last4": key[-4:] if len(key) >= 4 else None,
+    }
+
+
+def public_key_status() -> dict:
+    openai_key = _key_view("openai")
+    xai_key = _key_view("xai")
+    primary = xai_key if xai_key["configured"] and not openai_key["configured"] else openai_key
+    if not primary["configured"] and xai_key["configured"]:
+        primary = xai_key
+    return {
+        "configured": openai_key["configured"] or xai_key["configured"],
+        "source": primary["source"],
+        "last4": primary["last4"],
+        "openai": openai_key,
+        "xai": xai_key,
     }

@@ -2,6 +2,8 @@
 
 A local webpage for testing whether a chat model moves its answer toward a view the user has already stated.
 
+Project page: [applabuofa.github.io/framing-bias-lab](https://applabuofa.github.io/framing-bias-lab/)
+
 Students clone the repo, paste an API key, and run the study in the browser. The original 15-topic protocol is loaded for them. The page is built so they can change the design, collect again, and compare runs. The work is the iteration: one deliberate change at a time.
 
 The question, loaded with the study:
@@ -15,7 +17,7 @@ The question, loaded with the study:
 ## Set up
 
 ```bash
-git clone <your-repo-url> framing-bias-lab
+git clone https://github.com/APPLabUofA/framing-bias-lab.git
 cd framing-bias-lab
 python3 -m venv .venv
 source .venv/bin/activate
@@ -27,7 +29,13 @@ Or, from the repo folder: `./run.sh`
 
 Open [http://127.0.0.1:8000](http://127.0.0.1:8000). The server listens only on this computer.
 
-Paste the API key your instructor gave you into **Add API key**, then press **Test key**. The key is stored in `data/settings.json`, which git ignores. You can instead put it in a `.env` file as `OPENAI_API_KEY=...` (see `.env.example`). A key typed into the page wins over the environment variable. Do not commit a real key.
+Paste a key into **Add API key**, then press **Test key**. Choose **Grok (xAI)** or **OpenAI**. The key is stored in `data/settings.json`, which git ignores. You can instead put `OPENAI_API_KEY` or `XAI_API_KEY` in a `.env` file (see `.env.example`). A key typed into the page wins over the environment variable. Do not commit a real key.
+
+## Test with Grok
+
+Set the model to `grok-4.3` for a cheaper pilot, or `grok-4.7` for the current Grok model. Any model name that starts with `grok` is sent to `https://api.x.ai/v1` with the xAI key. Other names still go to OpenAI.
+
+The Grok conversation inside Cursor is not an API. This lab cannot call it. Create a key at [console.x.ai](https://console.x.ai), choose Grok in the key panel, and run a two-topic preview before a full grid. Dollar estimates for Grok are rough list prices. `grok-4.7` has no estimate filled in, so the page will show the call count only.
 
 Use the virtual environment for installs. Do not `pip install` into the system Python.
 

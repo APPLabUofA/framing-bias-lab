@@ -208,19 +208,19 @@ def render_html(run: dict, analysis: dict, trials: list[dict], compare: dict | N
 <meta charset="utf-8"/>
 <title>{_esc(config.get('study_name') or 'Framing lab report')}</title>
 <style>
-  body {{ margin: 0; background: #f4f0e6; color: #1c1915; font-family: Palatino, "Iowan Old Style", Georgia, serif; }}
+  body {{ margin: 0; background: #f3f2f1; color: #242424; font-family: "Segoe UI Variable", "Segoe UI", system-ui, sans-serif; }}
   main {{ max-width: 820px; margin: 0 auto; padding: 48px 28px 80px; }}
-  h1 {{ font-weight: 500; font-size: 2.1rem; letter-spacing: -0.03em; margin: 0 0 8px; }}
-  h2 {{ font-weight: 500; font-size: 1.35rem; margin-top: 2.2rem; border-top: 1px solid #e2d9c8; padding-top: 1rem; }}
+  h1 {{ font-weight: 600; font-size: 2.1rem; letter-spacing: -0.01em; margin: 0 0 8px; }}
+  h2 {{ font-weight: 500; font-size: 1.35rem; margin-top: 2.2rem; border-top: 3px solid #c43e1c; padding-top: 1rem; }}
   h3 {{ font-weight: 500; font-size: 1.05rem; }}
   p, li {{ line-height: 1.45; }}
-  .kicker {{ letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.72rem; color: #6e675d; font-family: "Avenir Next", "Segoe UI", sans-serif; }}
+  .kicker {{ letter-spacing: 0.1em; text-transform: uppercase; font-size: 0.72rem; color: #c43e1c; font-weight: 600; }}
   table {{ width: 100%; border-collapse: collapse; font-size: 0.92rem; }}
   th, td {{ text-align: left; vertical-align: top; border-bottom: 1px solid #e2d9c8; padding: 6px 8px 6px 0; }}
   code {{ font-family: ui-monospace, monospace; font-size: 0.84em; }}
   figure {{ margin: 1rem 0 1.4rem; }}
-  figure svg {{ width: 100%; height: auto; border: 1px solid #e2d9c8; background: #fbf8f1; }}
-  figcaption {{ font-family: "Avenir Next", "Segoe UI", sans-serif; font-size: 0.9rem; color: #3f3a33; margin-top: 6px; }}
+  figure svg {{ width: 100%; height: auto; border: 1px solid #e1dfdd; background: #ffffff; }}
+  figcaption {{ font-size: 0.9rem; color: #616161; margin-top: 6px; }}
   .trial {{ border-top: 1px solid #e2d9c8; padding-top: 0.6rem; }}
   .prompt {{ font-family: ui-monospace, monospace; font-size: 0.86rem; background: #fffdf8; padding: 8px 10px; }}
   @media print {{

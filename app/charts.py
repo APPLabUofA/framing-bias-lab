@@ -16,15 +16,15 @@ def _num(value) -> str:
 
 
 def _color_for_pole(pole: str) -> str:
-    return {"pro": "#1f6f5b", "con": "#9c3b2e", "neutral": "#6e675d"}.get(pole, "#1c1915")
+    return {"pro": "#0f6cbd", "con": "#c43e1c", "neutral": "#616161"}.get(pole, "#242424")
 
 
 def _diverging(value: float) -> str:
     # −2 rust, 0 paper, +2 teal
     t = max(-2.0, min(2.0, float(value))) / 2
     if t >= 0:
-        return _mix("#f4f0e6", "#1f6f5b", t)
-    return _mix("#f4f0e6", "#9c3b2e", -t)
+        return _mix("#ffffff", "#0f6cbd", t)
+    return _mix("#ffffff", "#c43e1c", -t)
 
 
 def _mix(a: str, b: str, t: float) -> str:
@@ -43,8 +43,8 @@ def _mix(a: str, b: str, t: float) -> str:
 def _empty(message: str, width: int = 720, height: int = 120) -> str:
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img">'
-        f'<rect width="100%" height="100%" fill="#f7f3ea"/>'
-        f'<text x="24" y="64" fill="#5c564c" font-family="Palatino, Georgia, serif" font-size="16">{_esc(message)}</text>'
+        f'<rect width="100%" height="100%" fill="#ffffff"/>'
+        f'<text x="24" y="64" fill="#616161" font-family="Segoe UI, system-ui, sans-serif" font-size="16">{_esc(message)}</text>'
         f"</svg>"
     )
 
@@ -61,8 +61,8 @@ def svg_stance_panels(panels: list[dict]) -> str:
     y_min, y_max = -2.4, 2.4
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img">',
-        '<rect width="100%" height="100%" fill="#fbf8f1"/>',
-        '<text x="52" y="22" fill="#1c1915" font-family="Palatino, Georgia, serif" font-size="15">Stance toward the pro claim</text>',
+        '<rect width="100%" height="100%" fill="#ffffff"/>',
+        '<text x="52" y="22" fill="#242424" font-family="Segoe UI, system-ui, sans-serif" font-size="15">Stance toward the pro claim</text>',
     ]
     inner_w = width - pad_l - pad_r
 
@@ -74,11 +74,11 @@ def svg_stance_panels(panels: list[dict]) -> str:
         top = pad_t + index * panel_h
         plot_bottom = y_of(y_min, top)
         zero = y_of(0, top)
-        parts.append(f'<text x="{pad_l}" y="{top + 14}" fill="#1c1915" font-family="Palatino, Georgia, serif" font-size="14">{_esc(panel["category"])}</text>')
-        parts.append(f'<line x1="{pad_l}" y1="{zero:.1f}" x2="{width - pad_r}" y2="{zero:.1f}" stroke="#d9d0c2" />')
+        parts.append(f'<text x="{pad_l}" y="{top + 14}" fill="#242424" font-family="Segoe UI, system-ui, sans-serif" font-size="14">{_esc(panel["category"])}</text>')
+        parts.append(f'<line x1="{pad_l}" y1="{zero:.1f}" x2="{width - pad_r}" y2="{zero:.1f}" stroke="#e1dfdd" />')
         for tick in (-2, -1, 0, 1, 2):
             yy = y_of(tick, top)
-            parts.append(f'<text x="{pad_l - 8}" y="{yy + 4:.1f}" text-anchor="end" fill="#6e675d" font-family="ui-monospace, monospace" font-size="11">{tick}</text>')
+            parts.append(f'<text x="{pad_l - 8}" y="{yy + 4:.1f}" text-anchor="end" fill="#616161" font-family="Cascadia Code, ui-monospace, monospace" font-size="11">{tick}</text>')
         points = panel["points"]
         n = max(len(points), 1)
         coords = []
@@ -88,7 +88,7 @@ def svg_stance_panels(panels: list[dict]) -> str:
             coords.append((x, y, point))
         if len(coords) >= 2:
             poly = " ".join(f"{x:.1f},{y:.1f}" for x, y, _ in coords)
-            parts.append(f'<polyline fill="none" stroke="#1c1915" stroke-width="1.6" points="{poly}"/>')
+            parts.append(f'<polyline fill="none" stroke="#242424" stroke-width="1.6" points="{poly}"/>')
         for x, y, point in coords:
             color = _color_for_pole(point.get("pole") or "")
             low = point.get("ci_low")
@@ -98,7 +98,7 @@ def svg_stance_panels(panels: list[dict]) -> str:
                 parts.append(f'<line x1="{x:.1f}" y1="{y1:.1f}" x2="{x:.1f}" y2="{y2:.1f}" stroke="{color}" stroke-width="1.4"/>')
             parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" fill="{color}"/>')
             parts.append(
-                f'<text x="{x:.1f}" y="{plot_bottom + 16:.1f}" text-anchor="middle" fill="#5c564c" font-family="Palatino, Georgia, serif" font-size="11">{_esc(point["label"])}</text>'
+                f'<text x="{x:.1f}" y="{plot_bottom + 16:.1f}" text-anchor="middle" fill="#616161" font-family="Segoe UI, system-ui, sans-serif" font-size="11">{_esc(point["label"])}</text>'
             )
     parts.append("</svg>")
     return "".join(parts)
@@ -116,8 +116,8 @@ def svg_shifts(rows: list[dict]) -> str:
     span = max(4.0, max(abs(v) for v in values) + 0.4)
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" role="img">',
-        '<rect width="100%" height="100%" fill="#fbf8f1"/>',
-        '<text x="168" y="18" fill="#1c1915" font-family="Palatino, Georgia, serif" font-size="15">Shift toward the user, by topic</text>',
+        '<rect width="100%" height="100%" fill="#ffffff"/>',
+        '<text x="168" y="18" fill="#242424" font-family="Segoe UI, system-ui, sans-serif" font-size="15">Shift toward the user, by topic</text>',
     ]
     plot_w = width - pad_l - pad_r
 
@@ -125,21 +125,21 @@ def svg_shifts(rows: list[dict]) -> str:
         return pad_l + (value + span) / (2 * span) * plot_w
 
     zero = x_of(0)
-    parts.append(f'<line x1="{zero:.1f}" y1="{pad_t}" x2="{zero:.1f}" y2="{height - pad_b}" stroke="#1c1915" stroke-width="1"/>')
+    parts.append(f'<line x1="{zero:.1f}" y1="{pad_t}" x2="{zero:.1f}" y2="{height - pad_b}" stroke="#242424" stroke-width="1"/>')
     for tick in (-2, -1, 0, 1, 2):
         if abs(tick) > span:
             continue
         xx = x_of(tick)
-        parts.append(f'<text x="{xx:.1f}" y="{height - 8}" text-anchor="middle" fill="#6e675d" font-size="11" font-family="ui-monospace, monospace">{tick}</text>')
-    colors = {"factual": "#3d5a80", "contested": "#8a5a2a", "value": "#1f6f5b"}
+        parts.append(f'<text x="{xx:.1f}" y="{height - 8}" text-anchor="middle" fill="#616161" font-size="11" font-family="Cascadia Code, ui-monospace, monospace">{tick}</text>')
+    colors = {"factual": "#616161", "contested": "#c19c00", "value": "#0f6cbd"}
     for index, row in enumerate(rows):
         y = pad_t + index * row_h + 12
-        color = colors.get(str(row.get("category")), "#1c1915")
+        color = colors.get(str(row.get("category")), "#242424")
         xx = x_of(float(row["shift"]))
         parts.append(f'<line x1="{zero:.1f}" y1="{y:.1f}" x2="{xx:.1f}" y2="{y:.1f}" stroke="{color}" stroke-width="1.2" opacity="0.7"/>')
         parts.append(f'<circle cx="{xx:.1f}" cy="{y:.1f}" r="4.5" fill="{color}"/>')
         parts.append(
-            f'<text x="{pad_l - 10}" y="{y + 4:.1f}" text-anchor="end" fill="#1c1915" font-family="Palatino, Georgia, serif" font-size="12">{_esc(row["label"])}</text>'
+            f'<text x="{pad_l - 10}" y="{y + 4:.1f}" text-anchor="end" fill="#242424" font-family="Segoe UI, system-ui, sans-serif" font-size="12">{_esc(row["label"])}</text>'
         )
     parts.append("</svg>")
     return "".join(parts)
@@ -157,29 +157,29 @@ def svg_heatmap(rows: list[dict], framings: list[dict]) -> str:
     height = head + cell_h * len(rows) + 20
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width:.0f} {height:.0f}" role="img">',
-        '<rect width="100%" height="100%" fill="#fbf8f1"/>',
+        '<rect width="100%" height="100%" fill="#ffffff"/>',
     ]
     for i, framing in enumerate(framings):
         x = label_w + i * cell + cell / 2
         parts.append(
-            f'<text x="{x:.1f}" y="48" text-anchor="end" fill="#1c1915" font-family="Palatino, Georgia, serif" font-size="11" transform="rotate(-40 {x:.1f} 48)">{_esc(framing["label"])}</text>'
+            f'<text x="{x:.1f}" y="48" text-anchor="end" fill="#242424" font-family="Segoe UI, system-ui, sans-serif" font-size="11" transform="rotate(-40 {x:.1f} 48)">{_esc(framing["label"])}</text>'
         )
     for r, row in enumerate(rows):
         y = head + r * cell_h
         parts.append(
-            f'<text x="{label_w - 8}" y="{y + 18}" text-anchor="end" fill="#1c1915" font-family="Palatino, Georgia, serif" font-size="12">{_esc(row["label"])}</text>'
+            f'<text x="{label_w - 8}" y="{y + 18}" text-anchor="end" fill="#242424" font-family="Segoe UI, system-ui, sans-serif" font-size="12">{_esc(row["label"])}</text>'
         )
         for c, value in enumerate(row["values"]):
             x = label_w + c * cell
             if value is None:
-                fill = "#f3eee4"
+                fill = "#f3f2f1"
                 label = ""
             else:
                 fill = _diverging(value)
                 label = _num(value)
-            parts.append(f'<rect x="{x + 2}" y="{y + 2}" width="{cell - 6}" height="{cell_h - 4}" rx="3" fill="{fill}" stroke="#e4dccb"/>')
+            parts.append(f'<rect x="{x + 2}" y="{y + 2}" width="{cell - 6}" height="{cell_h - 4}" rx="3" fill="{fill}" stroke="#e1dfdd"/>')
             parts.append(
-                f'<text x="{x + cell / 2:.1f}" y="{y + 18}" text-anchor="middle" fill="#1c1915" font-family="ui-monospace, monospace" font-size="10">{label}</text>'
+                f'<text x="{x + cell / 2:.1f}" y="{y + 18}" text-anchor="middle" fill="#242424" font-family="Cascadia Code, ui-monospace, monospace" font-size="10">{label}</text>'
             )
     parts.append("</svg>")
     return "".join(parts)

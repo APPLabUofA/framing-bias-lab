@@ -50,6 +50,14 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(title="Framing lab", lifespan=lifespan)
 
 
+@app.middleware("http")
+async def no_cache_for_assets(request, call_next):
+    response = await call_next(request)
+    if request.url.path == "/" or request.url.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
 @app.exception_handler(PlanError)
 async def plan_error(_request, exc: PlanError):
     return JSONResponse(status_code=400, content={"detail": str(exc)})
@@ -62,6 +70,11 @@ async def value_error(_request, exc: ValueError):
 
 class KeyIn(BaseModel):
     api_key: str
+    provider: str = "openai"
+
+
+class KeyTest(BaseModel):
+    provider: str = "openai"
 
 
 class StudyCreate(BaseModel):
@@ -199,23 +212,29 @@ def settings():
 @app.post("/api/settings/key")
 def put_key(body: KeyIn):
     key = body.api_key.strip()
+    if body.provider not in {"openai", "xai"}:
+        raise ValueError("Provider must be openai or xai.")
     if len(key) < 8:
         raise ValueError("That key looks too short.")
-    db.save_api_key(key)
+    db.save_api_key(key, body.provider)
     return db.public_key_status()
 
 
 @app.delete("/api/settings/key")
-def delete_key():
-    db.clear_api_key()
+def delete_key(provider: Optional[str] = None):
+    if provider not in {None, "openai", "xai"}:
+        raise ValueError("Provider must be openai or xai.")
+    db.clear_api_key(provider)
     return db.public_key_status()
 
 
 @app.post("/api/settings/test")
-def check_key():
-    key, _source = db.load_api_key()
+def check_key(body: KeyTest):
+    if body.provider not in {"openai", "xai"}:
+        raise ValueError("Provider must be openai or xai.")
+    key, _source = db.load_api_key(body.provider)
     try:
-        result = test_key(key)
+        result = test_key(key, body.provider)
     except Exception as exc:
         text = str(exc)
         if key and key in text:

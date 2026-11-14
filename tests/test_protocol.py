@@ -5,6 +5,16 @@ from app.prompts import resolve_prompt, stance_from_frame_score
 from app.seed import default_study
 
 
+def test_grok_models_use_the_xai_endpoint():
+    from app.providers import XAI_BASE_URL, client_kwargs, provider_for_model
+
+    assert provider_for_model("grok-4.7") == "xai"
+    assert provider_for_model("grok-4.3") == "xai"
+    assert provider_for_model("gpt-4o-mini") == "openai"
+    assert client_kwargs("secret", "xai", timeout=5)["base_url"] == XAI_BASE_URL
+    assert "base_url" not in client_kwargs("secret", "openai", timeout=5)
+
+
 def test_remote_work_prompts_match_the_plan():
     study = default_study()
     item = next(row for row in study["items"] if row["id"] == "remote-work")

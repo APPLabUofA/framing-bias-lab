@@ -7,6 +7,7 @@ import time
 
 from app import db
 from app.openai_client import complete_chat, judge_response
+from app.providers import missing_key_message, provider_for_model
 
 _tasks: dict[str, asyncio.Task] = {}
 _judge_tasks: dict[str, asyncio.Task] = {}
@@ -24,7 +25,7 @@ def process_one(run_id: str) -> dict:
     if trial is None:
         return {"outcome": "empty"}
     settings = run["config"]["settings"]
-    api_key, _source = db.load_api_key()
+    api_key, _source = db.load_api_key(provider_for_model(settings.get("model") or ""))
     messages = []
     system = (trial.get("system_prompt") or "").strip()
     if system:
@@ -47,11 +48,20 @@ def process_one(run_id: str) -> dict:
     return {"outcome": "completed"}
 
 
+def _key_for_run(run: dict) -> str:
+    model = (run.get("config") or {}).get("settings", {}).get("model") or ""
+    key, _source = db.load_api_key(provider_for_model(model))
+    if not key:
+        raise RuntimeError(missing_key_message(model))
+    return key
+
+
 def _safe_error(exc: Exception) -> str:
     text = str(exc)
-    key, _source = db.load_api_key()
-    if key and key in text:
-        text = text.replace(key, "…")
+    for provider in ("openai", "xai"):
+        key, _source = db.load_api_key(provider)
+        if key and key in text:
+            text = text.replace(key, "…")
     return text[:1500]
 
 
@@ -90,9 +100,7 @@ def start_run(run_id: str) -> None:
     run = db.get_run(run_id)
     if not run:
         raise KeyError(run_id)
-    key, _source = db.load_api_key()
-    if not key:
-        raise RuntimeError("No API key yet. Paste the key from your instructor in the key panel.")
+    _key_for_run(run)
     if run_id in _tasks and not _tasks[run_id].done():
         return
     _stop.discard(run_id)
@@ -115,7 +123,7 @@ def judge_one(run_id: str) -> dict:
     run = db.get_run(run_id)
     if not run:
         return {"outcome": "missing"}
-    api_key, _source = db.load_api_key()
+    api_key, _source = db.load_api_key(provider_for_model(run["config"]["settings"].get("model") or ""))
     try:
         judged = judge_response(trial["pro"], trial.get("response") or "", run["config"]["settings"], api_key)
     except Exception as exc:
@@ -153,9 +161,7 @@ def start_judge(run_id: str) -> None:
     run = db.get_run(run_id)
     if not run:
         raise KeyError(run_id)
-    key, _source = db.load_api_key()
-    if not key:
-        raise RuntimeError("No API key yet. Paste the key from your instructor in the key panel.")
+    _key_for_run(run)
     if run_id in _judge_tasks and not _judge_tasks[run_id].done():
         return
     _judge_stop.discard(run_id)

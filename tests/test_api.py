@@ -107,6 +107,19 @@ def test_blind_score_hides_the_prompt_and_con_agreement_flips(client, monkeypatc
     assert row["stance_pro"] == -2
 
 
+def test_grok_key_is_stored_separately_and_not_returned(client):
+    saved = client.post("/api/settings/key", json={"api_key": "xai-test-key-1234", "provider": "xai"})
+    assert saved.status_code == 200
+    body = saved.json()
+    assert "xai-test-key-1234" not in str(body)
+    assert body["xai"]["configured"] is True
+    assert body["xai"]["last4"] == "1234"
+    assert body["openai"]["configured"] is False
+    removed = client.delete("/api/settings/key?provider=xai")
+    assert removed.status_code == 200
+    assert removed.json()["xai"]["configured"] is False
+
+
 def test_fork_keeps_value_topics(client):
     study = _study(client)
     forked = client.post(f"/api/studies/{study['id']}/fork", json={"preset": "values_only"})

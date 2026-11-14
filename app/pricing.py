@@ -12,14 +12,19 @@ PRICES: dict[str, tuple[float, float]] = {
     "gpt-4.1-nano": (0.10, 0.40),
     "gpt-4.1-mini": (0.40, 1.60),
     "gpt-4.1": (2.00, 8.00),
+    "grok-4.3": (1.25, 2.50),
+    "grok-4.5": (2.00, 6.00),
+    "grok-4.6": (2.00, 6.00),
 }
 
 DISCLAIMER = (
     "Dollar amounts are rough planning numbers from published list prices, not a quote "
-    "and not a promise of the current rate. Check OpenAI's pricing page before a large run."
+    "and not a promise of the current rate. Check the provider's pricing page before a large run."
 )
 
 PRESET_MODELS = [
+    "grok-4.3",
+    "grok-4.7",
     "gpt-4o-mini",
     "gpt-4.1-mini",
     "gpt-4.1-nano",

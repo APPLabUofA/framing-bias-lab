@@ -8,39 +8,45 @@
 </head>
 <body>
   <header class="top">
-    <div class="brand">
-      <p class="kicker">Methods lab</p>
-      <p class="title">Framing lab</p>
+    <div class="top-inner">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span class="title">Framing lab</span>
+      </div>
+      <nav class="steps" aria-label="Experiment steps">
+        <button type="button" data-view="design"><span>1</span>Design</button>
+        <button type="button" data-view="collect"><span>2</span>Collect</button>
+        <button type="button" data-view="score"><span>3</span>Score</button>
+        <button type="button" data-view="analyze"><span>4</span>Analyze</button>
+        <button type="button" data-view="report"><span>5</span>Report</button>
+      </nav>
+      <div class="top-right">
+        <select id="study-select" aria-label="Study"></select>
+        <button id="key-pill" class="pill" type="button">Add API key</button>
+      </div>
     </div>
-    <label class="study-switch">
-      <span>Study</span>
-      <select id="study-select"></select>
-    </label>
     <p id="question" class="question"></p>
-    <button id="key-pill" class="pill" type="button">Add API key</button>
   </header>
-  <div class="layout">
-    <nav class="steps" aria-label="Experiment steps">
-      <button type="button" data-view="design"><span>1</span> Design</button>
-      <button type="button" data-view="collect"><span>2</span> Collect</button>
-      <button type="button" data-view="score"><span>3</span> Score</button>
-      <button type="button" data-view="analyze"><span>4</span> Analyze</button>
-      <button type="button" data-view="report"><span>5</span> Report</button>
-    </nav>
-    <main id="view"></main>
-  </div>
+  <main id="view"></main>
   <p id="toast" class="toast" hidden></p>
   <dialog id="key-dialog">
     <form id="key-form">
-      <p class="kicker">Instructor key</p>
-      <h2>API key</h2>
-      <p>Paste the key your instructor gave you. It is saved in a local file on this computer and is never written into a study, a run, or a report.</p>
-      <input id="key-input" type="password" autocomplete="off" placeholder="sk-…" />
+      <p class="kicker">API key</p>
+      <h2>OpenAI or Grok</h2>
+      <p>The key stays in a local file on this computer. It is never written into a study, a run, or a report. A model name that starts with <code>grok</code> uses the xAI key. Any other name uses the OpenAI key.</p>
+      <label class="field">Provider
+        <select id="key-provider">
+          <option value="xai">Grok (xAI)</option>
+          <option value="openai">OpenAI (ChatGPT)</option>
+        </select>
+      </label>
+      <input id="key-input" type="password" autocomplete="off" placeholder="Paste the key" />
+      <p id="key-help" class="hint">Create a key at console.x.ai. The Grok chat inside Cursor cannot be called from this lab.</p>
       <div class="row">
-        <button type="submit" value="save">Save key</button>
-        <button type="button" id="key-test">Test key</button>
-        <button type="button" id="key-clear">Remove saved key</button>
-        <button type="button" id="key-close">Close</button>
+        <button type="submit" value="save" class="primary">Save key</button>
+        <button type="button" id="key-test" class="ghost">Test key</button>
+        <button type="button" id="key-clear" class="ghost">Remove saved key</button>
+        <button type="button" id="key-close" class="ghost">Close</button>
       </div>
       <p id="key-msg" class="hint"></p>
     </form>

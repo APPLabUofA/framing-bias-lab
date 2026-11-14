@@ -16,7 +16,7 @@ class PlanError(ValueError):
 
 def is_reasoning_model(model: str) -> bool:
     name = (model or "").lower()
-    return any(name.startswith(prefix) for prefix in REASONING_PREFIXES)
+    return any(name.startswith(prefix) for prefix in REASONING_PREFIXES) or "reasoning" in name
 
 
 def _as_float(value, default: float) -> float:

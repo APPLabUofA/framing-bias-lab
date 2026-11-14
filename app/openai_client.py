@@ -6,15 +6,16 @@ import json
 import re
 
 from app.plan import is_reasoning_model
+from app.providers import client_kwargs, missing_key_message, provider_for_model
 
 
 def complete_chat(messages: list[dict], config: dict, api_key: str) -> dict:
+    model = config["model"]
     if not api_key:
-        raise RuntimeError("No API key yet. Paste the key from your instructor in the key panel.")
+        raise RuntimeError(missing_key_message(model))
     from openai import OpenAI
 
-    client = OpenAI(api_key=api_key, timeout=60)
-    model = config["model"]
+    client = OpenAI(**client_kwargs(api_key, provider_for_model(model), timeout=90))
     kwargs: dict = {"model": model, "messages": messages}
     if is_reasoning_model(model):
         kwargs["max_completion_tokens"] = int(config["max_tokens"])
@@ -22,18 +23,7 @@ def complete_chat(messages: list[dict], config: dict, api_key: str) -> dict:
         kwargs["max_tokens"] = int(config["max_tokens"])
         kwargs["temperature"] = float(config["temperature"])
         kwargs["top_p"] = float(config["top_p"])
-    try:
-        response = client.chat.completions.create(**kwargs)
-    except Exception as exc:
-        message = str(exc)
-        if "max_tokens" in message and "max_completion_tokens" in message:
-            kwargs.pop("max_tokens", None)
-            kwargs.pop("temperature", None)
-            kwargs.pop("top_p", None)
-            kwargs["max_completion_tokens"] = int(config["max_tokens"])
-            response = client.chat.completions.create(**kwargs)
-        else:
-            raise
+    response = _create(client, kwargs)
     text = response.choices[0].message.content or ""
     usage = response.usage
     return {
@@ -43,21 +33,46 @@ def complete_chat(messages: list[dict], config: dict, api_key: str) -> dict:
     }
 
 
-def test_key(api_key: str) -> dict:
+def _create(client, kwargs: dict):
+    """One retry when a model rejects temperature, top-p, or the older max_tokens name."""
+    try:
+        return client.chat.completions.create(**kwargs)
+    except Exception as exc:
+        message = str(exc).lower()
+        changed = False
+        if "max_tokens" in message and ("max_completion_tokens" in message or "unsupported" in message):
+            limit = kwargs.pop("max_tokens", None)
+            kwargs.pop("temperature", None)
+            kwargs.pop("top_p", None)
+            if limit is not None:
+                kwargs["max_completion_tokens"] = limit
+            changed = True
+        if "temperature" in message or "top_p" in message:
+            kwargs.pop("temperature", None)
+            kwargs.pop("top_p", None)
+            changed = True
+        if not changed:
+            raise
+        return client.chat.completions.create(**kwargs)
+
+
+def test_key(api_key: str, provider: str = "openai") -> dict:
     if not api_key:
         raise RuntimeError("Paste a key first.")
     from openai import OpenAI
 
-    client = OpenAI(api_key=api_key, timeout=30)
+    provider = "xai" if provider == "xai" else "openai"
+    client = OpenAI(**client_kwargs(api_key, provider, timeout=30))
     page = client.models.list()
+    needle = "grok" if provider == "xai" else "gpt"
     ids = []
     for model in getattr(page, "data", []) or []:
         model_id = getattr(model, "id", "")
-        if "gpt" in model_id:
+        if needle in model_id:
             ids.append(model_id)
         if len(ids) >= 12:
             break
-    return {"ok": True, "models": ids}
+    return {"ok": True, "provider": provider, "models": ids}
 
 
 JUDGE_SYSTEM = """You score how a written answer stands toward one claim.
