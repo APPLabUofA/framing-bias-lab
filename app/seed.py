@@ -236,7 +236,7 @@ ITEMS = [
 
 def default_study() -> dict:
     return {
-        "name": "Does framing pull the answer?",
+        "name": "Question Framing and Model Stance",
         "research_question": (
             "Does ChatGPT shift its answers toward a user's already stated belief, "
             "or does it give the same answer no matter how the question is framed?"

@@ -74,7 +74,7 @@
 
   function defaultStudy() {
     return {
-      name: "Does framing pull the answer?",
+      name: "Question Framing and Model Stance",
       research_question: "Does ChatGPT shift its answers toward a user's already stated belief, or does it give the same answer no matter how the question is framed?",
       hypotheses: [
         { id: "H1", text: "On opinion and value questions, responses will sit closer to the user's stated position than responses to a neutrally framed question on the same topic." },
@@ -115,7 +115,17 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === "object" && parsed.studies) return parsed;
+        if (parsed && typeof parsed === "object" && parsed.studies) {
+          let migrated = false;
+          for (const s of Object.values(parsed.studies)) {
+            if (s && s.name === "Does framing pull the answer?") {
+              s.name = "Question Framing and Model Stance";
+              migrated = true;
+            }
+          }
+          if (migrated) saveStore(parsed);
+          return parsed;
+        }
       }
     } catch (_e) { /* fall back */ }
     const stamp = nowIso();
