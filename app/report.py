@@ -13,12 +13,12 @@ EVIDENCE_LABELS = {
 }
 
 LIMITATIONS = [
-    "Each trial is its own API call, with no earlier turns and no saved memory. That matches a new chat with memory off. It is not the same thing as the consumer ChatGPT app, which can still differ in product settings.",
-    "The tests treat topics as the sample. Five topics in a category is a small sample of all the topics a person might ask about. A small p-value does not mean the pattern holds for every topic.",
-    "Replicates are averaged before the test. They make each cell steadier. They do not increase the number of topics.",
-    "The final score is given after the user's prompt is revealed, which is the protocol. The blind summary comes first so the rater has to characterize the answer before knowing which way the user leaned. Some answers repeat the user's words, which partly gives the frame away.",
-    "Factual items include an evidence note for interpretation. That note is never sent to the model. Agreeing with a false claim is a different kind of result from agreeing with a value claim.",
-    "Later runs are exploratory unless the change was written down before the scores were seen. Comparing many versions and keeping the one that 'works' will overstate the evidence.",
+    "Each trial is executed as an independent API call with no conversation history or saved memory. While this approximates a new chat with memory disabled, it may still differ from the consumer ChatGPT interface, which can include additional system prompts or product-level guardrails.",
+    "Hypothesis tests treat topics as the unit of analysis. Five topics per category is a modest sample size, so statistical power is limited and p-values should be interpreted alongside effect sizes and confidence intervals.",
+    "Replicate trials are averaged within each topic and framing before testing; additional replicates reduce measurement noise per cell but do not increase the topic sample size (N).",
+    "In the standard two-stage scoring flow, the rater writes a blind summary before the user prompt is revealed, then scores agreement with the stated claim. Responses that explicitly echo the user's phrasing can partially unblind the rater.",
+    "Factual items include an evidence classification for post-hoc interpretation (never sent to the model). Shifting toward a false factual claim has different implications than shifting on an open-ended value question.",
+    "Follow-up runs are exploratory unless the experimental modification and prediction were specified before inspecting the results.",
 ]
 
 
@@ -73,16 +73,15 @@ def _method_paragraph(run: dict) -> str:
     suffix_bit = "An extra instruction was appended to every prompt." if suffix else "No extra instruction was appended."
     temp = "omitted because this model does not use temperature" if settings.get("reasoning_model") else str(settings.get("temperature"))
     return (
-        f"We asked whether model answers move toward a position the user has already stated. "
-        f"The run sent {config.get('calls')} separate conversations to {settings.get('model')} "
-        f"({n_items} topics × {n_framings} framings × {settings.get('replicates')} replicate). "
-        f"Temperature was {temp}, top-p was {settings.get('top_p')}, and the reply cap was {settings.get('max_tokens')} tokens. "
+        f"To test whether model responses shift toward a user's stated belief, "
+        f"we submitted {config.get('calls')} independent single-turn prompts to {settings.get('model')} "
+        f"({n_items} topics × {n_framings} framings × {settings.get('replicates')} replicate(s); "
+        f"temperature = {temp}, top-p = {settings.get('top_p')}, max tokens = {settings.get('max_tokens')}). "
         f"{system_bit} {suffix_bit} "
-        f"Trial order and score order were shuffled with seed {config.get('seed')}. "
-        f"The outcome is a score from −2 to +2. The rater wrote a blind summary of the answer first, then saw the user's prompt and scored agreement with the claim the user made. "
-        f"For analysis, that score is turned into a stance toward the pro wording of the topic. "
-        f"The shift is how far a framed answer moved toward the user's side, compared with the same topic asked neutrally. "
-        f"Tests use one number per topic."
+        f"Trial presentation and scoring order were randomized using seed {config.get('seed')}. "
+        f"Each response was first summarized blind to the prompt, then scored for agreement with the user's stated claim on a −2 to +2 scale. "
+        f"Scores were mapped onto a unified stance scale toward the pro wording of each topic, and framing shift was computed relative to that topic's neutral baseline. "
+        f"All inferential tests were conducted at the topic level."
     )
 
 

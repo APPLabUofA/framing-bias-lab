@@ -175,26 +175,26 @@ function renderDesign() {
     <section class="stack">
       <div>
         <p class="kicker">Step 1 of 5 · Design</p>
-        <h2>Set up the experiment</h2>
-        <p class="lede">You do not have to change anything here. The defaults are a complete experiment, so you can go straight to Collect and press Start.</p>
+        <h2>Configure the Experiment</h2>
+        <p class="lede">The baseline 15-topic protocol is already loaded. You can proceed directly to Collect, or modify topics, framings, and model parameters below.</p>
       </div>
       <article class="card start-card">
         <div>
-          <h3>Ready as it is</h3>
-          <p class="hint">${nItems} topics × ${nFramings} framings × ${esc(study.collection?.replicates || 1)} = <b>${calls} questions</b> to ${esc(study.collection?.model || "the model")}. Each one is a brand-new chat with no memory.</p>
+          <h3>Baseline Protocol Ready</h3>
+          <p class="hint">${nItems} topics × ${nFramings} framings × ${esc(study.collection?.replicates || 1)} = <b>${calls} trials</b> sent to ${esc(study.collection?.model || "the model")}. Each trial runs in an isolated conversation with no prior context.</p>
         </div>
-        <button type="button" class="primary big" data-action="goto" data-view="collect">Go to Collect and press Start →</button>
+        <button type="button" class="primary big" data-action="goto" data-view="collect">Proceed to Collect →</button>
       </article>
-      ${guide("Want to change something? These are the easiest, in order:", [
-        "<b>Try a preset</b> below. One click makes a copy of this study with one change.",
-        "<b>Turn topics on or off</b> with the checkboxes in the topics table.",
-        "<b>Reword a prompt</b> by typing straight into the table cells.",
-        "Everything else is folded away at the bottom. Leave it alone on your first run.",
+      ${guide("Ways to iterate on the design", [
+        "<b>Create a 1-click variation</b> below to duplicate this study with a single controlled change.",
+        "<b>Enable or disable topics</b> using the checkboxes in the topics table.",
+        "<b>Edit prompt wording</b> directly in the table cells to test alternative phrasings.",
+        "Additional settings (framing templates, hypotheses, and model defaults) are available in the collapsible sections below.",
       ])}
       <article class="card mission stack">
         <div>
-          <h3>1-click variations</h3>
-          <p class="hint">Each copies this study with one change, so your next run differs in a way you can name.</p>
+          <h3>Single-Variable Variations</h3>
+          <p class="hint">Each preset duplicates the current study with one experimental change so you can isolate its effect.</p>
         </div>
         <div class="preset-grid">
           <button type="button" data-action="fork" data-preset="accuracy_prompt">Accuracy system prompt</button>
@@ -382,9 +382,9 @@ function updatePreview() {
   }
   const suffix = state.study.collection?.prompt_suffix || "";
   box.innerHTML = `
-    <div class="table-head"><h3>What the model will see for “${esc(item.label)}” <small>click a topic row or cell to switch</small></h3></div>
+    <div class="table-head"><h3>Prompt Preview for “${esc(item.label)}” <small>select any topic row above to inspect its prompts</small></h3></div>
     <div class="table-scroll"><table class="grid">
-      <thead><tr><th>Framing</th><th>Exact prompt</th></tr></thead>
+      <thead><tr><th>Framing</th><th>Prompt Sent to Model</th></tr></thead>
       <tbody>${(state.study.framings || []).map((framing) => `
         <tr><td><b>${esc(framing.label)}</b></td><td class="mono-cell">${esc(resolvePrompt(item, framing, suffix))}</td></tr>`).join("")}</tbody>
     </table></div>`;
@@ -422,14 +422,14 @@ async function renderCollect() {
     <section class="stack">
       <div>
         <p class="kicker">Step 2 of 5 · Collect</p>
-        <h2>Collect the answers</h2>
-        <p class="lede">Press <b>Start</b>. The app asks the model every question, one fresh chat each, and you can watch the progress below. It takes a few minutes.</p>
+        <h2>Collect Model Responses</h2>
+        <p class="lede">Press <b>Start</b> to query the model for each selected trial in an isolated conversation. Progress updates automatically below.</p>
       </div>
       <article class="card start-card" id="start-card"></article>
-      ${guide("Optional: the easiest things to change before you press Start", [
-        "<b>Run only a few topics</b> to test cheaply: click “First two” in the topics table.",
-        "<b>Replicates</b> asks each prompt several times, so you can see how much the answer wobbles by chance.",
-        "<b>Model</b> and <b>temperature</b> are under Quick settings. Change one thing per run so you can say what caused a difference.",
+      ${guide("Recommended collection options", [
+        "<b>Run a pilot first:</b> click “First two” in the topics table to test two topics at minimal cost.",
+        "<b>Replicates:</b> repeat each prompt multiple times to estimate random response variability.",
+        "<b>Controlled iteration:</b> change only one parameter (such as model or temperature) per run so differences remain interpretable.",
       ])}
       <form id="run-form" class="stack" onsubmit="return false">
         <article class="card stack">
@@ -560,13 +560,13 @@ function paintLive() {
   if (!box) return;
   const run = state.run;
   if (!run) {
-    box.innerHTML = "<div class='table-head'><h3>Progress</h3></div><p class='hint'>Nothing running. Press Start, or open a run from the list below. Answer text is hidden here so the blind scoring stays blind.</p>";
+    box.innerHTML = "<div class='table-head'><h3>Progress</h3></div><p class='hint'>No active run. Press Start above, or select a previous run below. Response text is hidden by default to preserve blind scoring.</p>";
     return;
   }
   const prog = run.progress || { done: 0, total: 0, error: 0, counts: {} };
   const width = prog.total ? Math.round((100 * prog.done) / prog.total) : 0;
   const next = run.status === "complete" && !prog.error
-    ? '<div class="done-banner"><b>All answers are in.</b> Next: <button type="button" class="primary" data-action="goto" data-view="score">Score them →</button></div>'
+    ? '<div class="done-banner"><b>Data collection complete.</b> Proceed to <button type="button" class="primary" data-action="goto" data-view="score">Score Responses →</button></div>'
     : "";
   box.innerHTML = `
     <div class="table-head"><h3>${esc(run.name)} <small class="status-${esc(run.status)}">${esc(run.status)} · ${prog.done}/${prog.total} answers${prog.error ? ` · ${prog.error} errors` : ""}</small></h3>
@@ -684,13 +684,13 @@ async function renderScore() {
     <section class="stack">
       <div>
         <p class="kicker">Step 3 of 5 · Score · ${esc(run.name)}</p>
-        <h2>Score each answer</h2>
-        <p class="lede">You will read about ${state.scoreMeta.answerable} short answers, one at a time. It goes fastest with the keyboard.</p>
+        <h2>Score Model Responses</h2>
+        <p class="lede">Evaluate ${state.scoreMeta.answerable} responses in randomized order. Keyboard shortcuts (1–5) are supported once the prompt is revealed.</p>
       </div>
-      ${guide("Two quick clicks per answer", [
-        "<b>Read the answer</b>, then pick whether it leans toward the claim, both sides, or against. Add a one-line summary and press Save. <i>The question is hidden on purpose, so you judge the answer fairly.</i>",
-        "<b>The question is revealed.</b> Press a number key 1 to 5 (or click a card) to score how much the answer agreed with what the user said.",
-        "When the bar is full, go to Analyze. Short on time? Use “Run judge” in Options to let a model score for you.",
+      ${guide("Two-stage blind scoring procedure", [
+        "<b>Blind summary:</b> read the response, indicate whether it leans toward the claim, presents both sides, or leans against it, and write a brief summary. <i>The user prompt remains hidden to reduce expectation bias.</i>",
+        "<b>Stance rating:</b> once the prompt is revealed, press keys 1–5 (or click a rating button) to score agreement with the stated claim from −2 to +2.",
+        "<b>Automated judge (optional):</b> you may also run a secondary model judge under Options to check inter-rater reliability on the Analyze page.",
       ])}
       <div class="card row">
         <div class="bar grow" style="flex:1;min-width:160px" aria-hidden="true"><span style="width:${payload.answerable ? Math.round((100 * payload.scored) / payload.answerable) : 0}%"></span></div>
@@ -732,9 +732,9 @@ function scoreCardHtml() {
   const card = state.card;
   if (!card) {
     if (!state.scoreMeta?.answerable) {
-      return `<div class="card"><h3>No answers yet</h3><p>Scoring starts once a trial has a reply. Collect the run first. The prompt stays hidden until you have written a summary.</p></div>`;
+      return `<div class="card"><h3>No responses to score yet</h3><p>Scoring becomes available once trials finish collecting. Prompts remain hidden until you record a blind summary.</p></div>`;
     }
-    return `<div class="card"><h3>Queue clear</h3><p>Every finished answer has a score for ${esc(state.rater)}. If a run is still collecting, come back when more answers land.</p></div>`;
+    return `<div class="card"><h3>All responses scored</h3><p>Every completed response in this run has been scored by ${esc(state.rater)}. Proceed to Analyze to view the results.</p></div>`;
   }
   const rubric = (state.study.rubric || []).slice().sort((a, b) => a.score - b.score);
   if (card.phase === "blind") {
@@ -794,14 +794,14 @@ async function renderAnalyze() {
     <section class="stack">
       <div>
         <p class="kicker">Step 4 of 5 · Analyze</p>
-        <h2>What did we find?</h2>
-        <p class="lede">The results update by themselves from your scores. Nothing to press.</p>
+        <h2>Statistical Analysis</h2>
+        <p class="lede">Summary statistics, hypothesis tests, and figures update automatically as scores are recorded.</p>
       </div>
-      ${guide("How to read this page", [
-        "Each <b>row</b> answers one hypothesis in plain words. The big number is the average shift toward the user's side. Above zero means the model followed the user.",
-        "Check the <b>figures</b> below: lines rising to the right mean pro-framing pulled the answer along.",
-        "With only a few topics, trust the size of the shift more than the p-value. Open “How this is computed” if you want the details.",
-        "Happy? Go to Report. Curious? Go back, change one thing, and run again to compare.",
+      ${guide("How to interpret these results", [
+        "Each <b>row</b> tests one pre-registered hypothesis. Positive shifts indicate that framed responses moved toward the user's stated position.",
+        "Inspect the <b>figures</b> below: an upward slope from con frames on the left to pro frames on the right indicates framing sensitivity.",
+        "With small topic samples, focus on the effect size (Cohen's d) and confidence interval alongside the p-value. Expand “Calculation details” for the exact test.",
+        "Proceed to Report to write your interpretation, or return to Design to test a single-variable follow-up run.",
       ])}
       <div class="card split-3">
         <label class="field">Run<select id="analysis-run">${state.runs.map((run) => `<option value="${esc(run.id)}" ${run.id === state.runId ? "selected" : ""}>${esc(run.name)}</option>`).join("")}</select></label>
@@ -839,11 +839,11 @@ function resultsTable(rows) {
     <article class="card table-card">
       <div class="table-head"><h3>Results <small>shift = average move toward the user's side · d = effect size · p = one-sided</small></h3></div>
       <div class="table-scroll"><table class="grid results">
-        <thead><tr><th></th><th>In plain words</th><th class="r">Shift</th><th class="r">d</th><th class="r">p</th></tr></thead>
+        <thead><tr><th></th><th>Summary</th><th class="r">Shift</th><th class="r">d</th><th class="r">p</th></tr></thead>
         <tbody>${rows.map(([id, result]) => `
           <tr><td><span class="hbadge">${esc(id)}</span></td>
-          <td>${esc(result.plain || result.note || "Not enough scores yet.")}
-            ${result.definition ? `<details><summary>How this is computed</summary><p class="hint">${esc(result.definition)}</p></details>` : ""}</td>
+          <td>${esc(result.plain || result.note || "Insufficient scored trials.")}
+            ${result.definition ? `<details><summary>Calculation details</summary><p class="hint">${esc(result.definition)}</p></details>` : ""}</td>
           <td class="r big-num">${fmt(result.mean)}</td><td class="r">${fmt(result.d)}</td><td class="r">${fmtP(result.p_one)}</td></tr>`).join("")}</tbody>
       </table></div>
     </article>`;
@@ -886,13 +886,13 @@ async function renderReport() {
     <section class="stack">
       <div>
         <p class="kicker">Step 5 of 5 · Report</p>
-        <h2>Write it up</h2>
-        <p class="lede">The method, tests, and figures are already filled in from your run.</p>
+        <h2>Generate Report</h2>
+        <p class="lede">The method, statistical tests, and figures are compiled automatically from your run.</p>
       </div>
-      ${guide("Three things left", [
-        "<b>Write what you think it means</b> in the first box, in your own words.",
-        "<b>Say what you would change next.</b> That is your next experiment.",
-        "Press <b>Save into the report</b>, then download or open it. The limitations section is always included.",
+      ${guide("Finalizing your report", [
+        "<b>Interpret the findings:</b> summarize what the results suggest regarding H1–H3 in your own words.",
+        "<b>Plan your next iteration:</b> note the single experimental change you intend to test next.",
+        "Click <b>Save into the report</b>, then export as HTML, Markdown, or CSV.",
       ])}
       <div class="card stack">
         <label class="field">Interpretation<textarea id="note-interpretation">${esc(notes.interpretation || "")}</textarea></label>

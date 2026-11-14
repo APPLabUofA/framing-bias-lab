@@ -1165,7 +1165,7 @@ stance is an integer from -2 to 2 toward the claim:
 <h2>What this run changed</h2><p>${escHtml(run.change_note || "No change was declared for this run.")}</p>
 <h2>Question and hypotheses</h2><ol>${hypList}</ol>
 <h2>Method</h2>
-<p>Sent ${config.calls} separate conversations to ${escHtml(settings.model)} (temperature ${settings.temperature}, top-p ${settings.top_p}, max tokens ${settings.max_tokens}, seed ${config.seed}).</p>
+<p>To test whether model responses shift toward a user's stated belief, we submitted ${config.calls} independent single-turn prompts to ${escHtml(settings.model)} (temperature = ${settings.temperature}, top-p = ${settings.top_p}, max tokens = ${settings.max_tokens}, seed = ${config.seed}).</p>
 <h3>Topics</h3><table><tr><th>Topic</th><th>Category</th><th>Evidence</th><th>Pro</th><th>Con</th><th>Neutral</th><th>Note</th></tr>${itemRows}</table>
 <h3>Framing templates</h3><table><tr><th>Framing</th><th>Side</th><th>Strength</th><th>Template</th></tr>${framingRows}</table>
 <h3>Rubric</h3><ul>${rubricRows}</ul>
