@@ -1,10 +1,10 @@
 # Framing lab
 
-A local webpage for testing whether a chat model moves its answer toward a view the user has already stated.
+A webpage for testing whether a chat model moves its answer toward a view the user has already stated.
 
-Project page: [applabuofa.github.io/framing-bias-lab](https://applabuofa.github.io/framing-bias-lab/)
+**Use it directly in your browser (zero install):** [applabuofa.github.io/framing-bias-lab](https://applabuofa.github.io/framing-bias-lab/)
 
-Students clone the repo, paste an API key, and run the study in the browser. The original 15-topic protocol is loaded for them. The page is built so they can change the design, collect again, and compare runs. The work is the iteration: one deliberate change at a time.
+Open the link, paste an OpenAI or Grok API key into **Add API key** (stored only in your browser's local storage), and run the study. The original 15-topic protocol is loaded for you. The page is built so you can change the design, collect again, and compare runs. The work is the iteration: one deliberate change at a time.
 
 The question, loaded with the study:
 

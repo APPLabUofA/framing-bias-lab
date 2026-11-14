@@ -3,155 +3,55 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Framing Lab — APPLab</title>
-  <style>
-    :root {
-      --bg: #f6f5f3;
-      --card: #ffffff;
-      --ink: #201f1e;
-      --muted: #5c5a58;
-      --accent: #0f6cbd;
-      --border: #e1dfdd;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-      line-height: 1.55;
-    }
-    main {
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 48px 20px 80px;
-    }
-    .kicker {
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: var(--accent);
-      margin: 0 0 8px;
-    }
-    h1 {
-      font-size: 2.1rem;
-      line-height: 1.2;
-      margin: 0 0 12px;
-    }
-    h2 {
-      font-size: 1.25rem;
-      margin: 0 0 10px;
-    }
-    p { margin: 0 0 14px; }
-    .lede {
-      font-size: 1.08rem;
-      color: var(--muted);
-      margin-bottom: 24px;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px 24px;
-      margin-bottom: 18px;
-    }
-    .steps {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
-    }
-    .step {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 12px;
-      background: #faf9f8;
-    }
-    .step b { display: block; margin-bottom: 4px; }
-    .step span { font-size: 0.9rem; color: var(--muted); }
-    pre {
-      background: #1b1a19;
-      color: #f3f2f1;
-      padding: 14px 16px;
-      border-radius: 6px;
-      overflow-x: auto;
-      font-size: 0.88rem;
-      line-height: 1.45;
-    }
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 16px;
-    }
-    a.btn {
-      display: inline-block;
-      padding: 9px 15px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.92rem;
-      border: 1px solid var(--border);
-      color: var(--ink);
-      background: var(--card);
-    }
-    a.btn.primary {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #ffffff;
-    }
-    ul { margin: 8px 0 0; padding-left: 20px; }
-    li { margin-bottom: 6px; }
-  </style>
+  <title>Framing lab</title>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <main>
-    <p class="kicker">APPLab · University of Alberta</p>
-    <h1>Framing Lab</h1>
-    <p class="lede">
-      A local web app for testing whether a chat model shifts its answers toward a user's stated belief—built directly from the 15-topic, 5-framing student research proposal.
-    </p>
-
-    <div class="actions" style="margin-bottom: 24px;">
-      <a class="btn primary" href="https://github.com/APPLabUofA/framing-bias-lab">View GitHub Repository</a>
-      <a class="btn" href="https://github.com/APPLabUofA/framing-bias-lab/blob/main/docs/student-proposal.md">Original Proposal</a>
-      <a class="btn" href="https://github.com/APPLabUofA/framing-bias-lab/blob/main/docs/suggested-changes.md">Review &amp; Next-Step Ideas</a>
-    </div>
-
-    <section class="card">
-      <h2>How the 5-step workflow works</h2>
-      <p>The app runs locally on your computer using your own OpenAI or xAI (Grok) API key. Your original 15 topics and 5 framing templates are pre-loaded so you can run a baseline right away, then tweak one variable at a time.</p>
-      <div class="steps">
-        <div class="step"><b>1. Design</b><span>Edit topics, framings, system prompts, or use 1-click presets.</span></div>
-        <div class="step"><b>2. Collect</b><span>Run each prompt in a fresh, memory-off API call.</span></div>
-        <div class="step"><b>3. Score</b><span>Summarize answers blind before revealing the prompt and rating −2 to +2.</span></div>
-        <div class="step"><b>4. Analyze</b><span>Automatic H1–H3 tests, framing slope, CIs, and SVG figures.</span></div>
-        <div class="step"><b>5. Report</b><span>Export HTML, Markdown, or CSV for your write-up.</span></div>
+  <header class="top">
+    <div class="top-inner">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span class="title">Framing lab</span>
       </div>
-    </section>
-
-    <section class="card">
-      <h2>Run it on your computer</h2>
-      <p>Clone the repository, install dependencies in a virtual environment, and launch the local server:</p>
-      <pre>git clone https://github.com/APPLabUofA/framing-bias-lab.git
-cd framing-bias-lab
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-./run.sh</pre>
-      <p>Then open <code>http://127.0.0.1:8000</code> in your browser, click <strong>Add API key</strong>, paste the key from your instructor, and run a 2-topic pilot before collecting the full 15 × 5 grid.</p>
-    </section>
-
-    <section class="card">
-      <h2>What is built in for iterating</h2>
-      <ul>
-        <li><strong>Pre-loaded baseline:</strong> All 15 topics (Factual, Contested, Value) and 5 framings (Strong Con to Strong Pro).</li>
-        <li><strong>1-click study forks:</strong> Test an accuracy system prompt, an honesty suffix, Temperature 0, or 3 replicates in one click.</li>
-        <li><strong>Multi-model support:</strong> Works with OpenAI (<code>gpt-4o-mini</code>, <code>gpt-4o</code>, etc.) and xAI Grok models.</li>
-        <li><strong>Run comparison:</strong> Compare framing slopes and H1–H3 results across runs.</li>
-      </ul>
-    </section>
-  </main>
+      <nav class="steps" aria-label="Experiment steps">
+        <button type="button" data-view="design"><span>1</span>Design</button>
+        <button type="button" data-view="collect"><span>2</span>Collect</button>
+        <button type="button" data-view="score"><span>3</span>Score</button>
+        <button type="button" data-view="analyze"><span>4</span>Analyze</button>
+        <button type="button" data-view="report"><span>5</span>Report</button>
+      </nav>
+      <div class="top-right">
+        <select id="study-select" aria-label="Study"></select>
+        <button id="key-pill" class="pill" type="button">Add API key</button>
+      </div>
+    </div>
+    <p id="question" class="question"></p>
+  </header>
+  <main id="view"></main>
+  <p id="toast" class="toast" hidden></p>
+  <dialog id="key-dialog">
+    <form id="key-form">
+      <p class="kicker">API key</p>
+      <h2>OpenAI or Grok</h2>
+      <p>The key stays in your browser's local storage on this device and is never written into a study, run, or report. A model name that starts with <code>grok</code> calls xAI; any other name calls OpenAI.</p>
+      <label class="field">Provider
+        <select id="key-provider">
+          <option value="xai">Grok (xAI)</option>
+          <option value="openai">OpenAI (ChatGPT)</option>
+        </select>
+      </label>
+      <input id="key-input" type="password" autocomplete="off" placeholder="Paste the key" />
+      <p id="key-help" class="hint">Create a key at console.x.ai or paste the OpenAI key from your instructor.</p>
+      <div class="row">
+        <button type="submit" value="save" class="primary">Save key</button>
+        <button type="button" id="key-test" class="ghost">Test key</button>
+        <button type="button" id="key-clear" class="ghost">Remove saved key</button>
+        <button type="button" id="key-close" class="ghost">Close</button>
+      </div>
+      <p id="key-msg" class="hint"></p>
+    </form>
+  </dialog>
+  <script src="./lab-core.js"></script>
+  <script src="./app.js"></script>
 </body>
 </html>
